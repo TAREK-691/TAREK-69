@@ -22,11 +22,11 @@
   ],
   "whiteListMode": {
     "enable": false,
-    "whiteListIds": [61552930114349],
+    "whiteListIds": [61576622066727],
     "notes": "if you enable this feature, only the ids in the whiteListIds section can use the bot"
   },
-  "nickNameBot": "-`ღ´ᵞᴼᵁᴿ 🌷𝐁𝐁'𝐗᯽",
-  "prefix": "/",
+  "nickNameBot": "Yowai mo ",
+  "prefix": ".",
   "database": {
     "type": "mongodb",
     "uriMongodb": "mongodb+srv://tanjil4:tanjil4@cluster0.lqh9lyk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
