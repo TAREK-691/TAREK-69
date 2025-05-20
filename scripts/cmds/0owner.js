@@ -22,9 +22,9 @@ module.exports = {
 
     const ment = [{ id: id, tag: name }];
     
-    const a = "-`ღ´ᵞᴼᵁᴿ 🌷𝐁𝐁'𝐗᯽";
+    const a = "Ehrhr";
     const b = "."; // Prefix
-    const c = "〲 T A N J I L ツ";
+    const c = "Tarek";
     const e = "Male";
     const f = "𝟏𝟖 ±";
     const g = "𝐒𝐢𝐧𝐠𝐥𝐞";
