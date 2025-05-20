@@ -22,14 +22,14 @@ module.exports = {
 
     const ment = [{ id: id, tag: name }];
     
-    const a = "Ehrhr";
+    const a = "yowai mo";
     const b = "."; // Prefix
     const c = "Tarek";
     const e = "Male";
     const f = "𝟏𝟖 ±";
-    const g = "𝐒𝐢𝐧𝐠𝐥𝐞";
-    const h = "𝐈𝐧𝐭𝐞𝐫 𝟐";
-    const i = "𝐃𝐡𝐚𝐤𝐚";
+    const g = "Hide";
+    const h = "Diploma in civil Engineering (session-2023-24)";
+    const i = "Tangail";
     const d = "N/A";
 
     message.reply({ 
