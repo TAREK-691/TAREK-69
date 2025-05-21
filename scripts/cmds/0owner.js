@@ -4,7 +4,7 @@ module.exports = {
   config: {
     name: "owner",
     version: 2.0,
-    author: "〲 T A N J I L ツ",
+    author: "𝗧𝗔𝗥𝗘𝗞 𝗦𝗛𝗜𝗞𝗗𝗔𝗥",
     longDescription: "info about bot and owner",
     category: "Special",
     guide: {
@@ -22,15 +22,15 @@ module.exports = {
 
     const ment = [{ id: id, tag: name }];
     
-    const a = "yowai mo";
+    const a = "Yσωαι мσ";
     const b = "."; // Prefix
-    const c = "Tarek";
-    const e = "Male";
+    const c = "—͞Ƭꫝʀᴇҡㅤi!";
+    const e = "𝒎𝒂𝒍𝒆";
     const f = "𝟏𝟖 ±";
-    const g = "Hide";
-    const h = "Diploma in civil Engineering (session-2023-24)";
-    const i = "Tangail";
-    const d = "N/A";
+    const g = "𝑨𝒎𝒂𝒓 𝒃𝒐𝒔𝒔 𝒔𝒊𝒏𝒈𝒍𝒆 𝒂𝒌𝒕𝒂 𝒈𝒇 𝒌𝒉𝒖𝒋𝒆 𝒅𝒆";
+    const h = "𝐃𝐢𝐩𝐥𝐨𝐦𝐚 𝐢𝐧 𝐂𝐢𝐯𝐢𝐥 𝐄𝐧𝐠𝐢𝐧𝐞𝐞𝐫𝐢𝐧𝐠 (𝐬𝐞𝐬𝐬𝐢𝐨𝐧-𝟐𝟎𝟐𝟑-𝟐𝟒)";
+    const i = "𝑻𝒂𝒏𝒈𝒂𝒊𝒍";
+    const d = "𝑇𝑎𝑟𝑒𝑘 𝑆ℎ𝑖𝑘𝑑𝑎𝑟";
 
     message.reply({ 
       body: `᯽ ${name} ᯽
