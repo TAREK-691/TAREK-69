@@ -21,14 +21,14 @@ const keywords = ["tarek"];
 
 module.exports = {
   config: {
-    name: "mentionTarek",
+    name: "mention",
     version: "1.6",
-    author: "T A N J I L",
+    author: "Tarek",
     shortDescription: {
-      en: "Replies when Tarek is mentioned by name or tag",
+      en: "Replies when Tarek is mentioned",
     },
     longDescription: {
-      en: "Automatically responds if someone types Tarek's name or tags him.",
+      en: "Avoid double reply issue when 'Tarek ke' is used",
     },
     category: "no prefix",
     usages: "",
@@ -42,8 +42,11 @@ module.exports = {
     const mentionList = Object.entries(event.mentions || {});
     const targetUID = "100047994102529"; // Tarek's UID
 
+    // Don't trigger here if "tarek ke" is already in message (let the other command handle it)
+    if (message.includes("tarek ke") || message.includes("tarek কে") || message.includes("tarek k")) return;
+
     const isMentionedByTag = mentionList.some(([uid]) => uid === targetUID);
-    const isMentionedByName = keywords.some(keyword => message.includes(keyword));
+    const isMentionedByName = keywords.some(keyword => message.includes(keyword.toLowerCase()));
 
     if (isMentionedByTag || isMentionedByName) {
       const randomReply = replies[Math.floor(Math.random() * replies.length)];
