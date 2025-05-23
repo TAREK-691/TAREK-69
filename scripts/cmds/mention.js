@@ -11,7 +11,7 @@ const replies = [
   "Dak deoyar age chinta koros? 🤔",
   "ডাকাডাকি না করে আগে ওকে একটা প্রেম করিয়ে দাও, তবেই কথা বলবে! 💌",
   "Boss er battery low, charge dite hobe 🔋⚡",
-  "Boss er moto rare animal onno koi nai! 🦄",
+  "Boss re dakis na to 😡 ki hoiche amk bol 🙂🌷",
 "Boss এর প্রেমের গরম ঢেউয়ে ডুবে যেও না! 🌊🔥",
 "Boss কে ডাকো না, ও এখন প্রেমে ডুবে আছে! 🌊💕",
   "Tag dile boss er phone vibrate hoye jabe! 📳",
