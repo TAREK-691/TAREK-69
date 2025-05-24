@@ -1,4 +1,6 @@
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
   config: {
@@ -52,7 +54,24 @@ module.exports = {
         `🕒 Data Updated: ${updateTime}\n` +
         `⏰ Current Time: ${currentTime} (BD Time)`;
 
-      api.sendMessage(weatherText, event.threadID);
+      // Download the image first
+      const imageUrl = "https://res.cloudinary.com/mahiexe/image/upload/v1748113926/mahi/1748113926085-913546189.png";
+      const imagePath = path.join(__dirname, "weather_image.png");
+      const image = await axios.get(imageUrl, { responseType: 'stream' });
+
+      // Save image to local path temporarily
+      const writer = fs.createWriteStream(imagePath);
+      image.data.pipe(writer);
+
+      writer.on('finish', () => {
+        api.sendMessage({
+          body: weatherText,
+          attachment: fs.createReadStream(imagePath)
+        }, event.threadID, () => {
+          // Delete image after sending
+          fs.unlinkSync(imagePath);
+        });
+      });
 
     } catch (err) {
       console.log(err);
