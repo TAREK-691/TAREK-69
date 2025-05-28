@@ -1,104 +1,49 @@
-const fs = require("fs-extra");
-const request = require("request");
-const os = require("os");
-
-module.exports = {
+.cmd install info.js module.exports = {
   config: {
     name: "info",
-    version: "1.3",
-    author: "✨ Eren Yeh ✨",
-    shortDescription: "Display bot and user information along with uptime and Imgur images/videos.",
-    longDescription: "Show detailed info about the bot and the user, with uptime and Imgur image/video features.",
+    version: "1.5",
+    author: "✨ Tarek ✨",
+    shortDescription: "Display bot and owner info",
+    longDescription: "Shows owner's and bot's details with videos.",
     category: "INFO",
-    guide: {
-      en: "[user]",
-    },
+    guide: { en: "[user]" },
   },
 
-  onStart: async function ({ api, event, args }) {
-    // Replace with your info
-    const userInfo = {
-      name: "𝑇𝑎𝑟𝑒𝑘 𝑆ℎ𝑖𝑘𝑑𝑎𝑟",  // Replace with your name
-      age: "𝟏𝟖±",           // Replace with your age
-      location: "𝑻𝒂𝒏𝒈𝒂𝒊𝒍",    // Replace with your location
-      bio: " Always Learning!", // Replace with your bio
-      botName: "𝐁𝐨𝐥𝐛𝐨 𝐧𝐚", // Replace with bot's name
-      botVersion: "1.0",    // Replace with bot's version
-    };
-
-    // Calculate bot uptime
-    const botUptime = process.uptime(); // in seconds
-    const botHours = Math.floor(botUptime / 3600);
-    const botMinutes = Math.floor((botUptime % 3600) / 60);
-    const botSeconds = Math.floor(botUptime % 60);
-    const formattedBotUptime = `${botHours} hours, ${botMinutes} minutes, ${botSeconds} seconds`;
-
-    // Calculate system uptime in days, hours, minutes, and seconds
-    const systemUptime = os.uptime(); // in seconds
-    const sysDays = Math.floor(systemUptime / (3600 * 24)); // Convert seconds to days
-    const sysHours = Math.floor((systemUptime % (3600 * 24)) / 3600); // Remaining hours
-    const sysMinutes = Math.floor((systemUptime % 3600) / 60); // Remaining minutes
-    const sysSeconds = Math.floor(systemUptime % 60); // Remaining seconds
-    const formattedSystemUptime = `${sysDays} days, ${sysHours} hours, ${sysMinutes} minutes, ${sysSeconds} seconds`;
-
-    // Example Imgur video links
-    const imgurLinks = [
-      "https://i.imgur.com/lzLYl1w.mp4",  // Replace with actual Imgur video links
-      "https://i.imgur.com/lzLYl1w.mp4",
+  onStart: async function ({ api, event }) {
+    const videoUrls = [
+      "https://files.catbox.moe/fk4p6y.mp4",  // 1st video
+      "https://files.catbox.moe/vovx3d.mp4",  // 2nd video
     ];
 
-    // Download videos and send them as attachments
-    const downloadVideo = (url, filePath) => {
-      return new Promise((resolve, reject) => {
-        request(url)
-          .pipe(fs.createWriteStream(filePath))
-          .on("close", resolve)
-          .on("error", reject);
-      });
-    };
+    const msgBody = `
+┌────────────────┐
+           𝗢𝗪𝗡𝗘𝗥 𝗜𝗡𝗙𝗢
+└────────────────┘
 
-    // Construct the body message with more space
-    const bodyMsg = `
-Information: 🥷
+  ☁️ 𝗡𝗮𝗺𝗲 ➝ 𝗧𝗮𝗿𝗲𝗸 𝗦𝗵𝗶𝗸𝗱𝗮𝗿
+  🎂 𝗔𝗴𝗲 ➝ 18+
+  🧠 𝗘𝗱𝘂𝗰𝗮𝘁𝗶𝗼𝗻 ➝ 𝗗𝗶𝗽𝗹𝗼𝗺𝗮 𝗶𝗻 𝗖𝗶𝘃𝗶𝗹 𝗘𝗻𝗴𝗶𝗻𝗲𝗲𝗿𝗶𝗻𝗴                  
+  ❄️ 𝘀𝗲𝘀𝘀𝗶𝗼𝗻 ➝ 2023-24
+  🏠 𝗙𝗿𝗼𝗺 ➝ 𝗧𝗮𝗻𝗴𝗮𝗶𝗹
+  ❤️ 𝗥𝗲𝗹𝗮𝘁𝗶𝗼𝗻 ➝ 𝐒𝐢𝐧𝐠𝐥𝐞
+  ♂️ 𝗚𝗲𝗻𝗱𝗲𝗿 ➝ 𝐌𝐚𝐥𝐞
 
-- Name: ${userInfo.name}
-- Age: ${userInfo.age}
-- Location: ${userInfo.location}
-- Bio: ${userInfo.bio}
+━━━━━━━━━━━━━━━━━━
 
-Bot Details:
+ ✦ 𝗛𝗼𝗯𝗯𝗶𝗲𝘀 ➝ ɢᴀᴍɪɴɢ • ᴍᴜsɪᴄ
 
-- Bot Name: ${userInfo.botName}
-- Bot Version: ${userInfo.botVersion}
-- Bot Uptime: ${formattedBotUptime}
+━━━━━━━━━━━━━━━━━━
 
-System Uptime:
+✨ 𝗕𝗼𝘁 𝗧𝘆𝗽𝗲 ➝ 𝗚𝗼𝗮𝘁𝗕𝗼𝘁 𝗩𝟮
 
-- System Uptime: ${formattedSystemUptime}
+💫 𝗧𝗵𝗮𝗻𝗸𝘀 𝗳𝗼𝗿 𝘂𝘀𝗶𝗻𝗴 𝗺𝗲 💫
+    `;
 
-─────────────────────
-`;
+    const randomVideo = videoUrls[Math.floor(Math.random() * videoUrls.length)];
 
-    // Prepare video attachments
-    const videoPaths = [];
-    for (let i = 0; i < imgurLinks.length; i++) {
-      const videoPath = __dirname + `/cache/video${i}.mp4`;
-      await downloadVideo(imgurLinks[i], videoPath);
-      videoPaths.push(videoPath);
-    }
-
-    // Send message with info and video attachments
-    api.sendMessage(
-      { 
-        body: bodyMsg, 
-        attachment: videoPaths.map(path => fs.createReadStream(path))
-      },
-      event.threadID,
-      () => {
-        // Clean up downloaded video files
-        videoPaths.forEach(path => fs.unlinkSync(path));
-      },
-      event.messageID
-    );
+    api.sendMessage({
+      body: msgBody,
+      attachment: await global.utils.getStreamFromURL(randomVideo),
+    }, event.threadID, event.messageID);
   },
 };
