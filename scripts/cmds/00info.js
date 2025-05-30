@@ -1,4 +1,4 @@
-.cmd install info.js module.exports = {
+module.exports = {
   config: {
     name: "info",
     version: "1.5",
