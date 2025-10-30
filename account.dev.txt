@@ -1,1 +1,101 @@
-Kiwi browser theke cokkie deoya lagve....
+[
+    {
+        "key": "dbln",
+        "value": "%7B%2261582513048272%22%3A%22csqoSP0M%22%7D",
+        "domain": "facebook.com",
+        "path": "/login/device-based/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.660Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "sb",
+        "value": "WKRAZ6OlnfqK7SKGqphEjrNt",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "ps_l",
+        "value": "1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "ps_n",
+        "value": "1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "dpr",
+        "value": "3.2983407974243164",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "c_user",
+        "value": "61577905736523",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "datr",
+        "value": "65EDaZmsIz2OG07qUd6TQsAd",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "fr",
+        "value": "1hxmljJsc59oOYMrG.AWc00B9HhqXhh-ThB-m1ZGMdxZNuh6VyoIgKzzYI_E7C_53npDI.Bo_79j..AAA.0.0.BpA5Hr.AWfzEC-oBQfFNzHWvMEcFh7Vrdw",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "xs",
+        "value": "8%3A40babYicqw9uxw%3A2%3A1761841645%3A-1%3A-1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.661Z",
+        "lastAccessed": "2025-10-30T16:28:14.661Z"
+    },
+    {
+        "key": "wd",
+        "value": "891x1802",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.663Z",
+        "lastAccessed": "2025-10-30T16:28:14.663Z"
+    },
+    {
+        "key": "presence",
+        "value": "C%7B%22t3%22%3A%5B%5D%2C%22utc3%22%3A1761841675684%2C%22v%22%3A1%7D",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2025-10-30T16:28:14.663Z",
+        "lastAccessed": "2025-10-30T16:28:14.663Z"
+    }
+]
