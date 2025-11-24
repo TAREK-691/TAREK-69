@@ -1,192 +1,365 @@
+const fs = require("fs-extra");
 const os = require("os");
-const pidusage = require("pidusage");
-const fs = require("fs");
-const { createCanvas } = require('canvas'); // loadImage সরানো হয়েছে, কারণ এই কোডে ছবির দরকার নেই
-const path = require('path');
+const path = require("path");
 
-// কাস্টম ফন্ট রেজিস্ট্রেশন সরানো হলো - এটি অনেক সময় ইনস্টলেশনের সমস্যা তৈরি করে
+let createCanvas, loadImage;
+let canvasAvailable = false;
+
+try {
+    const canvas = require("canvas");
+    createCanvas = canvas.createCanvas;
+    loadImage = canvas.loadImage;
+    canvasAvailable = true;
+    console.log("✅ [UPTIME] Canvas loaded successfully");
+} catch (err) {
+    console.log("❌ [UPTIME] Canvas not available:", err.message);
+    canvasAvailable = false;
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
+function formatUptime(seconds) {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const parts = [];
+    if (days > 0) parts.push(`${days}d`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
+
+    return parts.join(" ");
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
+/**
+ * !!! PLACEHOLDER FOR DATABASE ACCESS !!!
+ * REPLACE the content of this function with your actual database queries
+ * to fetch the real number of active users and threads.
+ */
+async function getBotStatsFromDatabase() {
+    try {
+        // EKHANE APNAR ASOL DATABASE ACCESS LOGIC BOSHAN
+        
+        // EKHON DUMMY DATA RETURN KORCHE:
+        const activeUsers = 1200; 
+        const activeThreads = 85; 
+        
+        // Simulate a short database query delay (ei line-ti rakhte paren)
+        await new Promise(resolve => setTimeout(resolve, 50)); 
+
+        return { 
+            activeUsers: activeUsers, 
+            activeThreads: activeThreads 
+        };
+    } catch (error) {
+        // JODI DATABASE ACCESS E ERROR HOY
+        console.error("Database Fetch Error:", error);
+        return { activeUsers: 'ERROR', activeThreads: 'ERROR' };
+    }
+}
+
+
+async function createUptimeCard(botUptime, systemUptime, cpuUsage, memoryUsage, totalMemory, platform, hostname, activeUsers, activeThreads) {
+
+    if (!canvasAvailable) return null;
+
+    // Canvas size reduced as Network Configuration is removed
+    const canvas = createCanvas(1400, 950); 
+    const ctx = canvas.getContext("2d");
+
+    try {
+        // BACKGROUND
+        roundRect(ctx, 0, 0, 1400, 950, 30);
+        ctx.clip();
+
+        const gradient = ctx.createLinearGradient(0, 0, 1400, 950);
+        gradient.addColorStop(0, "#0f0c29");
+        gradient.addColorStop(0.5, "#302b63");
+        gradient.addColorStop(1, "#24243e");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1400, 950);
+
+        // HEADER
+        roundRect(ctx, 50, 50, 1300, 120, 20);
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fill();
+
+        ctx.font = "bold 64px Arial";
+        ctx.fillStyle = "#FFD700";
+        ctx.textAlign = "center";
+        ctx.fillText("SYSTEM PERFORMANCE", 700, 130);
+
+        const leftCardX = 70;
+        const rightCardX = 730;
+        const cardWidth = 610;
+        const cardHeight = 160;
+
+        // --- ROW 1: UPTIME CARDS ---
+        let currentY = 210;
+        const uptimeCards = [
+            {
+                title: "Bot Uptime",
+                value: formatUptime(botUptime),
+                subtitle: "Active Session Duration",
+                x: leftCardX,
+            },
+            {
+                title: "System Uptime",
+                value: formatUptime(systemUptime),
+                subtitle: "Server Running Time",
+                x: rightCardX,
+            }
+        ];
+
+        uptimeCards.forEach(card => {
+            roundRect(ctx, card.x, currentY, cardWidth, cardHeight, 20);
+            ctx.fillStyle = "rgba(255,255,255,0.1)";
+            ctx.fill();
+
+            ctx.font = "bold 28px Arial";
+            ctx.fillStyle = "#FFD700";
+            ctx.textAlign = "left";
+            ctx.fillText(card.title, card.x + 40, currentY + 50);
+
+            ctx.font = "bold 44px Arial";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillText(card.value, card.x + 40, currentY + 100);
+
+            ctx.font = "italic 18px Arial";
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.fillText(card.subtitle, card.x + 40, currentY + 130);
+        });
+
+        // --- ROW 2: USERS & THREADS CARDS ---
+        currentY += cardHeight + 20;
+        const statusCards = [
+            {
+                title: "Users", // Changed from Active Users
+                value: activeUsers.toString(),
+                subtitle: "Total Users in Database",
+                x: leftCardX,
+                color: "#4CAF50" // Green
+            },
+            {
+                title: "Threads", // Changed from Active Threads
+                value: activeThreads.toString(),
+                subtitle: "Total Threads/Groups",
+                x: rightCardX,
+                color: "#FFA500" // Orange
+            }
+        ];
+        
+        statusCards.forEach(card => {
+            roundRect(ctx, card.x, currentY, cardWidth, cardHeight, 20);
+            ctx.fillStyle = "rgba(255,255,255,0.1)";
+            ctx.fill();
+
+            ctx.font = "bold 28px Arial";
+            ctx.fillStyle = "#FFD700";
+            ctx.textAlign = "left";
+            ctx.fillText(card.title, card.x + 40, currentY + 50);
+
+            ctx.font = "bold 44px Arial";
+            ctx.fillStyle = card.color;
+            ctx.fillText(card.value, card.x + 40, currentY + 100);
+
+            ctx.font = "italic 18px Arial";
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.fillText(card.subtitle, card.x + 40, currentY + 130);
+        });
+        
+        // --- ROW 3: CPU & MEMORY CARDS (Shifted) ---
+        currentY += cardHeight + 20;
+
+        const cpuColor = cpuUsage > 80 ? "#FF6B6B" : cpuUsage > 50 ? "#FFA500" : "#4CAF50";
+        roundRect(ctx, leftCardX, currentY, cardWidth, cardHeight, 20);
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fill();
+
+        ctx.font = "bold 28px Arial";
+        ctx.fillStyle = "#FFD700";
+        ctx.fillText("CPU Usage", leftCardX + 40, currentY + 50);
+
+        ctx.font = "bold 44px Arial";
+        ctx.fillStyle = cpuColor;
+        ctx.fillText(`${cpuUsage.toFixed(1)}%`, leftCardX + 40, currentY + 100);
+
+        // MEMORY CARD
+        const memPercent = (memoryUsage / totalMemory) * 100;
+        const memColor = memPercent > 80 ? "#FF6B6B" : memPercent > 50 ? "#FFA500" : "#4CAF50";
+
+        roundRect(ctx, rightCardX, currentY, cardWidth, cardHeight, 20);
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fill();
+
+        ctx.font = "bold 28px Arial";
+        ctx.fillStyle = "#FFD700";
+        ctx.fillText("Memory Usage", rightCardX + 40, currentY + 50);
+
+        ctx.font = "bold 32px Arial";
+        ctx.fillStyle = memColor;
+        ctx.fillText(`${formatBytes(memoryUsage)} / ${formatBytes(totalMemory)}`, rightCardX + 40, currentY + 100);
+
+        // --- ROW 4: PLATFORM (Shifted) ---
+        currentY += cardHeight + 20;
+
+        roundRect(ctx, leftCardX, currentY, 1270, 110, 20);
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fill();
+
+        ctx.font = "bold 28px Arial";
+        ctx.fillStyle = "#FFD700";
+        ctx.fillText("Platform", leftCardX + 40, currentY + 45);
+
+        ctx.font = "bold 38px Arial";
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText(platform.toUpperCase(), leftCardX + 40, currentY + 90);
+
+        ctx.font = "22px Arial";
+        ctx.textAlign = "right";
+        ctx.fillText(`Updated: ${new Date().toLocaleString()}`, 1320, currentY + 90);
+
+        // --- FOOTER ---
+        // Footer Y-position adjusted for smaller canvas height
+        ctx.font = "italic bold 24px Arial"; 
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,215,0,0.8)";
+        ctx.fillText("Powered by Tarek Shikdar", 700, 920); 
+
+        const buffer = canvas.toBuffer("image/png");
+        const time = Date.now();
+        const tmpDir = path.join(__dirname, "tmp");
+
+        await fs.ensureDir(tmpDir);
+
+        const outPath = path.join(tmpDir, `uptime_${time}.png`);
+        await fs.writeFile(outPath, buffer);
+
+        return { stream: fs.createReadStream(outPath), path: outPath };
+
+    } catch (e) {
+        console.log("Canvas Error:", e);
+        return null;
+    }
+}
 
 module.exports = {
-  config: {
-    name: "uptime",
-    aliases: ["up"],
-    version: "2.3",
-    author: "TAREK",
-    countDown: 1,
-    role: 0,
-    shortDescription: "Show system and bot status as an image",
-    longDescription: "Displays uptime, CPU, memory, disk, and bot stats as a visually appealing image card.",
-    category: "info",
-    guide: "{pn}",
-    noPrefix: true
-  },
+    config: {
+        name: "uptime",
+        version: "1.0.0",
+        author: "Tarek Shikdar (Fixed by AI)",
+        role: 2,
+        description: { en: "System performance dashboard" },
+        category: "system"
+    },
 
-  // Normal prefix handler
-  onStart: async function (ctx) {
-    await module.exports.sendUptime(ctx);
-  },
+    langs: {
+        en: {
+            // Network line removed. Titles changed.
+            uptimeInfo:
+                "▣ System Dashboard\n\n◷ Bot Uptime: %1\n▣ System Uptime: %2\n👥 Users: %9\n💬 Threads: %10\n⚡ CPU Usage: %3%\n◆ Memory: %4 / %5\n⊕ Platform: %6\n▣ Hostname: %7" 
+        }
+    },
 
-  // noPrefix now public
-  onChat: async function (ctx) {
-    const input = ctx.event.body?.toLowerCase().trim();
-    const { config } = module.exports;
-    const triggers = [config.name, ...(config.aliases || [])];
+    onStart: async function ({ message, getLang, usersData, threadsData }) {
 
-    if (!triggers.includes(input)) return;
+        const botUptime = process.uptime();
+        const systemUptime = os.uptime();
+        
+        // --- Fetch Database Stats ---
+        let activeUsers = 0;
+        let activeThreads = 0;
+        try {
+            const users = await usersData.getAll();
+            const threads = await threadsData.getAll();
+            activeUsers = users.length;
+            activeThreads = threads.length;
+        } catch (e) {
+            console.error("Failed to fetch Users/Threads data:", e.message);
+            activeUsers = 'N/A';
+            activeThreads = 'N/A';
+        }
+        // ----------------------------
 
-    await module.exports.sendUptime(ctx);
-  },
-
-  sendUptime: async function ({ message, usersData, threadsData }) {
-    // --- ১. প্রয়োজনীয় ডেটা সংগ্রহ করা ---
-    const now = new Date();
-    const formatDate = now.toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
-
-    const uptimeBot = process.uptime();
-    const uptimeSys = os.uptime();
-    const toTime = (sec) => {
-      const d = Math.floor(sec / 86400);
-      const h = Math.floor((sec % 86400) / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = Math.floor(sec % 60);
-      return `${d ? `${d}d ` : ""}${h}h ${m}m ${s}s`;
-    };
-
-    const usage = await pidusage(process.pid);
-    const totalRam = (os.totalmem() / 1024 / 1024 / 1024).toFixed(0);
-    const freeRam = (os.freemem() / 1024 / 1024 / 1024).toFixed(0);
-    const usedRam = (usage.memory / 1024 / 1024).toFixed(1);
-    const cpuUsage = usage.cpu.toFixed(1);
-    const cpuModel = os.cpus()[0].model;
-    const cpuCores = os.cpus().length;
-    // package.json ফাইলটির সঠিক পথ নিশ্চিত করা 
-    const pkgPath = path.join(process.cwd(), 'package.json');
-    let pkgCount = 0;
-    try {
-        pkgCount = Object.keys(JSON.parse(fs.readFileSync(pkgPath)).dependencies || {}).length;
-    } catch (e) {
-        // যদি package.json খুঁজে না পায় বা পড়তে না পারে
-        console.error("Error reading package.json:", e.message);
-        pkgCount = 'N/A';
-    }
-
-    const users = await usersData.getAll();
-    const threads = await threadsData.getAll();
-    
-    const diskUsed = '325G / 387G';
-    const diskAvailable = '264G';
-
-
-    // --- ২. ক্যানভাস দিয়ে ইমেজ তৈরি করা ---
-    const width = 800;
-    const height = 900;
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-    
-    // ব্যাকগ্রাউন্ড ডিজাইন
-    ctx.fillStyle = '#1e1e2f'; 
-    ctx.fillRect(0, 0, width, height);
-    
-    // কার্ডের হেডার
-    ctx.font = 'bold 55px sans-serif'; 
-    ctx.fillStyle = '#ff79c6'; 
-    ctx.textAlign = 'center';
-    ctx.fillText('⚡️ SYSTEM STATUS', width / 2, 90);
-    ctx.strokeStyle = '#6272a4';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(50, 110);
-    ctx.lineTo(width - 50, 110);
-    ctx.stroke();
-
-    // ডেটা লাইনগুলির জন্য শুরু করার y-স্থানাঙ্ক
-    let y_offset = 180;
-    const line_height = 45;
-    const label_color = '#f8f8f2';
-    const value_color = '#50fa7b';
-    const font_size = 28;
-    ctx.textAlign = 'left';
-
-    // সেকশন টাইটেল প্রিন্ট করার ফাংশন
-    const drawSectionTitle = (title) => {
-        ctx.font = 'bold 30px sans-serif';
-        ctx.fillStyle = '#8be9fd';
-        ctx.fillText(`— ${title} —`, 50, y_offset);
-        y_offset += 40;
-    }
-
-    // ডেটা লাইন প্রিন্ট করার ফাংশন
-    const drawLine = (label, value) => {
-      ctx.font = `${font_size}px sans-serif`;
-      ctx.fillStyle = label_color;
-      ctx.fillText(label, 60, y_offset);
-      
-      if (value !== undefined) {
-          ctx.font = `bold ${font_size}px sans-serif`;
-          ctx.fillStyle = value_color;
-          ctx.textAlign = 'right';
-          ctx.fillText(value, width - 60, y_offset);
-          ctx.textAlign = 'left';
-      }
-      y_offset += line_height;
-    };
-    
-    // ডেটাগুলি ক্যানভাসে আঁকা
-    drawLine('📅 Current Date & Time:', formatDate);
-    y_offset += line_height * 0.5;
-
-    drawSectionTitle('⏱️ Uptime & System');
-    drawLine('Bot Uptime:', toTime(uptimeBot));
-    drawLine('System Uptime:', toTime(uptimeSys));
-    y_offset += line_height * 0.5;
-
-    drawSectionTitle('💻 Hardware Status');
-    drawLine('CPU Model:', cpuModel);
-    drawLine('CPU Cores:', cpuCores.toString());
-    drawLine('CPU Load:', `${cpuUsage}%`);
-    drawLine('RAM Used:', `${usedRam} MB / ${totalRam} GB`);
-    drawLine('Free Memory:', `${freeRam} GB`);
-    y_offset += line_height * 0.5;
-
-    drawSectionTitle('📊 Bot Stats');
-    drawLine('Total Users:', users.length.toLocaleString());
-    drawLine('Total Groups:', threads.length.toLocaleString());
-    drawLine('Total Packages:', pkgCount.toLocaleString());
-    y_offset += line_height * 0.5;
-
-    drawSectionTitle('💾 Disk Space');
-    drawLine('Disk Used:', diskUsed);
-    drawLine('Available:', diskAvailable);
-
-    // ফুটার
-    ctx.font = '20px sans-serif';
-    ctx.fillStyle = '#6272a4';
-    ctx.textAlign = 'center';
-    ctx.fillText('Developed by Tarek Shikdar', width / 2, height - 20);
-
-    // --- ৩. ইমেজ বাফার তৈরি ও পাঠানো ---
-    const buffer = canvas.toBuffer('image/png');
-    
-    const imagePath = path.join(__dirname, `uptime_status_${Date.now()}.png`);
-    fs.writeFileSync(imagePath, buffer);
-
-    try {
-        await message.reply({
-            body: "✨ Bot Uptime and System Status Card:",
-            attachment: fs.createReadStream(imagePath)
+        // CPU
+        const cpus = os.cpus();
+        let idle = 0, total = 0;
+        cpus.forEach(cpu => {
+            for (let type in cpu.times) total += cpu.times[type];
+            idle += cpu.times.idle;
         });
-    } catch (e) {
-        console.error("Failed to send image, sending as text.", e);
-        // যদি ইমেজ পাঠাতে ব্যর্থ হয়, টেক্সট মেসেজ পাঠানো
-        const msg = `Bot Status:
-        Uptime: ${toTime(uptimeBot)}
-        CPU Load: ${cpuUsage}%
-        RAM: ${usedRam} MB / ${totalRam} GB
-        Users: ${users.length} | Groups: ${threads.length}
-        `;
-        await message.reply(msg);
+        const cpuUsage = 100 - Math.floor((idle / total) * 100);
+
+        // MEMORY
+        const totalMemory = os.totalmem();
+        const freeMemory = os.freemem();
+        const usedMemory = totalMemory - freeMemory;
+
+        const platform = os.platform();
+        const hostname = os.hostname();
+
+        // NETWORK - Removed all network logic as requested
+
+        try {
+            // networkInfo argument removed from createUptimeCard call
+            const result = await createUptimeCard(
+                botUptime,
+                systemUptime,
+                cpuUsage,
+                usedMemory,
+                totalMemory,
+                platform,
+                hostname,
+                activeUsers, 
+                activeThreads 
+            );
+
+            if (result) {
+                const { stream, path: imgPath } = result;
+
+                stream.on("close", () => fs.unlink(imgPath).catch(() => {}));
+
+                return message.reply({ attachment: stream });
+            }
+        } catch (err) {
+            console.log("Image Error:", err);
+        }
+
+        return message.reply(
+            getLang(
+                "uptimeInfo",
+                formatUptime(botUptime),
+                formatUptime(systemUptime),
+                cpuUsage,
+                formatBytes(usedMemory),
+                formatBytes(totalMemory),
+                platform,
+                hostname,
+                activeUsers,   
+                activeThreads  
+            )
+        );
     }
-    
-    fs.unlinkSync(imagePath);
-  }
 };
