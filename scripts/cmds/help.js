@@ -15,7 +15,8 @@ module.exports = {
   },
 
   onStart: async function ({ message, args, event, threadsData }) {
-    const allCommands = global.GoatBot.commands;
+    // এই ফাংশনের ভেতরে ব্যবহৃত 'global.GoatBot.commands', 'global.GoatBot.aliases', এবং 'threadsData' এর অ্যাক্সেস আছে ধরে নেওয়া হলো।
+    const allCommands = global.GoatBot.commands; 
     const prefix =
       (await threadsData.get(event.threadID))?.prefix ||
       global.GoatBot.config.prefix;
@@ -64,7 +65,7 @@ module.exports = {
       return message.reply(msg);
     }
 
-    // ✅ Case: Category filter
+    // ✅ Case: Category filter (কমান্ডের নাম দেখাবে)
     if (
       arg &&
       arg.startsWith("-") &&
@@ -97,7 +98,7 @@ module.exports = {
       return message.reply(msg);
     }
 
-    // ✅ Case: Command info
+    // ✅ Case: Command info (যেটি আপনি পরিবর্তন করতে চেয়েছিলেন)
     if (arg && isNaN(arg)) {
       const input = arg.toLowerCase();
       const command =
@@ -119,58 +120,69 @@ module.exports = {
         case "usage":
         case "-g":
         case "guide":
-          msg += "֍─────| USAGE |─────֎\n";
-          msg += `🛠 ${guide}\n`;
-          msg += "╰────────────────⦿\n";
+          msg += "╭─── 📚 Usage ───\n";
+          msg += `│ 🛠 ${guide}\n`;
+          msg += "╰───────────────◊\n";
           break;
         case "-i":
         case "info":
-          msg += "֍─────| INFO |──────֎\n";
-          msg += `🛠 Command name: ${prefix}${config.name}\n`;
-          msg += `📝 Description: ${
+          msg += "╭─── 📌 Info ───\n";
+          msg += `│ 🛠 Command name: ${prefix}${config.name}\n`;
+          msg += `│ 📝 Description: ${
             config.longDescription || config.shortDescription || "Not provided"
           }\n`;
-          msg += `🌊 Other names: ${aliases}\n`;
-          msg += `📦 Version: ${config.version || "1.0"}\n`;
-          msg += `🎭 Role: ${config.role}\n`;
-          msg += `⏱ Time per command: ${config.countDown || "1s"}\n`;
-          msg += `✍️ Author: ${config.author || "Unknown"}\n`;
-          msg += "╰───────────────⦿\n";
+          msg += `│ 🌊 Other names: ${aliases}\n`;
+          msg += `│ 📦 Version: ${config.version || "1.0"}\n`;
+          msg += `│ 🎭 Role: ${config.role}\n`;
+          msg += `│ ⏱ Time per command: ${config.countDown || "1s"}\n`;
+          msg += `│ ✍️ Author: ${config.author || "Unknown"}\n`;
+          msg += "╰───────────────◊\n";
           break;
         case "-r":
         case "role":
-          msg += "֍────| ROLE |────֎\n";
-          msg += `🎭 ${config.role} (${
+          msg += "╭─── 🎭 Role ─── \n";
+          msg += `│ 🎭 ${config.role} (${
             config.role === 0 ? "All users" : "Restricted"
           })\n`;
-          msg += "╰─────────────⦿\n";
+          msg += "╰───────────────◊\n";
           break;
         case "-a":
         case "alias":
-          msg += "֍─────| ALIAS |─────֎\n";
-          msg += `🌊 Other names: ${aliases}\n`;
-          msg += "╰───────────────⦿\n";
+          msg += "╭─── 🌐 Aliases ───\n";
+          msg += `│ 🌊 Other names: ${aliases}\n`;
+          msg += "╰───────────────◊\n";
           break;
         default:
-          msg += "֎─────────────────֍\n";
-          msg += "📌 Command Information\n\n";
-          msg += `💠 Name: ${prefix}${config.name}\n`;
-          msg += `📝 Description: ${
+          // ✨ নতুন ডিটেইলস ফরমেট শুরু ✨
+          msg += `✨ [ Command: ${config.name.toUpperCase()} ] ✨\n\n`;
+
+          msg += "╭─── 📜 Details ───\n";
+          msg += `│ 🔹 Name: ${prefix}${config.name}\n`;
+          msg += `│ 📝 Description: ${
             config.longDescription || config.shortDescription || "Not provided"
-          }\n`;
-          msg += `📦 Version: ${config.version || "1.0"}\n`;
-          msg += `✍️ Author: ${config.author || "Unknown"}\n`;
-          msg += `🎭 Role Required: ${config.role}\n`;
-          msg += `🌊 Aliases: ${aliases}\n`;
-          msg += `🛠 Usage: ${guide}\n`;
-          msg += "╰─────────────────⦿\n";
+          } ${config.category ? `[Category: ${config.category.toUpperCase()}]` : ""}\n`;
+          msg += `│ 🌐 Aliases: ${aliases}\n`;
+          msg += `│ 🛠 Version: ${config.version || "1.0"}\n`;
+          msg += `│ 🔒 Role: ${config.role === 0 ? "Everyone 😊" : `Role ${config.role}`}\n`;
+          msg += `│ ⏳ Cooldown: ${config.countDown || "1s"}\n`;
+          msg += `│ ✍️ Author: ${config.author || "Unknown"}\n`;
+          msg += "╰───────────────◊\n";
+
+          msg += "╭─── 📚 Usage ───\n";
+          // গাইডলাইনকে প্রতি লাইন একটি '╰‣' দিয়ে দেখানো হলো
+          const usageLines = guide.split('\n');
+          for (const line of usageLines) {
+              msg += `╰‣ ${line.trim()}\n`;
+          }
+          msg += "╰───────────────◊\n";
+          // ✨ নতুন ডিটেইলস ফরমেট শেষ ✨
           break;
       }
 
       return message.reply(msg);
     }
 
-    // ✅ Case: Show all categories + commands
+    // ✅ Case: Show all categories + commands (যদি কোনো আর্গুমেন্ট না থাকে)
     let msg = "";
     for (const cat of sortedCategories) {
       msg += `╭──⦿ 【 ${cat} 】\n`;
